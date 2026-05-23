@@ -16,12 +16,10 @@
 
 set -euo pipefail
 
-# ------ EDIT THESE TWO LINES AFTER PUBLISHING THE RELEASE ------------------
-REPO_RELEASE_URL="https://github.com/<USER>/<REPO>/releases/download/<TAG>"
-# expected SHA256 checksums (already known)
+REPO_RELEASE_URL="https://github.com/RushabhaB/phase-only-array-safety/releases/download/v0.1.0"
+# expected SHA256 checksums
 SMAT_SHA256="4704b49dec5d7e5735e73b5477ac4945c2ffc8d29a814b3ea40f7042191ae69b"
-CUBE_SHA256=""   # fill in once cube is uploaded
-# ----------------------------------------------------------------------------
+CUBE_SHA256=""   # fill in once the 16 GB cube is uploaded
 
 DEST="$(dirname "$0")/../data/Data"
 mkdir -p "$DEST"
