@@ -4,7 +4,7 @@ Reference implementation of the algorithms in:
 
 > R. Balaji, R. Li, D. Cabric. *Phase-Only Beamforming under Array Safety
 > Constraints in Extremely Large Antenna Arrays: A Majorization–Minimization
-> Framework.* IEEE Transactions on Signal Processing, 2026.
+> Framework.* submitted to IEEE Transactions on Signal Processing, 2026.
 
 This repository contains:
 
