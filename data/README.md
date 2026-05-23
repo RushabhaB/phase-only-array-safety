@@ -19,7 +19,7 @@ repository (free, up to 2 GB per asset, no LFS quotas).
 | File | Size | SHA256 (first 12 chars) | Required by |
 |---|---|---|---|
 | `Data/Smat_36x36_90MHz.mat` | 517 MB | `4704b49dec5d…` | `antenna_array.Array._get_coupling_matrix` — i.e. **any** code instantiating `Array("Vivaldi36")`. Includes all paper-reproduction scripts. |
-| `S_data_cube_Vivaldi36.h5` | 16 GB | *(set on upload)* | `scripts/run_imm.py` only — running iMM from scratch on the full per-element-per-frequency reflection cube. |
+| `S_data_cube_Vivaldi36.h5` | 16 GB | (built locally) | `scripts/run_imm.py` only. **Build it from Smat with `python scripts/build_cube.py`** — takes ~10–30 min on CPU, ~32 GB RAM. No separate download needed. |
 
 [rel]: https://github.com/RushabhaB/phase-only-array-safety/releases
 
