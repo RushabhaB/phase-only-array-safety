@@ -1,0 +1,12 @@
+# Core scientific stack
+numpy>=1.24
+scipy>=1.10
+h5py>=3.8
+matplotlib>=3.7
+torch>=2.0
+tqdm>=4.65
+
+# Convex optimization (inf-norm relaxation)
+cvxpy>=1.4
+mosek>=10.0      # commercial; academic license available at mosek.com
+

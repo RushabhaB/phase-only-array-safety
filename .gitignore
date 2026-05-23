@@ -1,0 +1,24 @@
+# Outputs
+results/
+*.npz
+
+# Big data files (not for the public repo -- see data/README.md)
+data/Data/Smat_36x36_90MHz.mat
+data/S_data_cube_Vivaldi36.h5
+data/*.h5
+
+# Python build artefacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+
+# MATLAB build artefacts
+*.asv
+
+# Editor/OS
+.DS_Store
+.idea/
+.vscode/
+data/Data/SimpleVivaldi_24x4_BruteForce18Pts.mat
