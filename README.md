@@ -151,13 +151,14 @@ solved by ADMM directly on the (N+1)×(N+1) complex matrix
 matrix for the affine projection is Cholesky-factored once at setup; each
 iteration is one back-solve plus one Hermitian eigendecomposition. With a
 warm start from the iMM weights the algorithm converges in a few hundred
-iterations. See `docs/sdr_admm.pdf` for the full derivation.
+iterations. See [`docs/sdr_admm.md`](docs/sdr_admm.md) for the derivation
+summary that matches this release implementation.
 
 ## Reproducing the paper
 
 ```bash
-# All three cases. iMM step needs the data cube; the rest do not (they
-# reuse the saved weights/optimized_results_iMM_case_*.mat).
+# All three cases. iMM needs the data cube; the other two reuse the
+# shipped weights in weights/imm/case_*_imm.mat.
 
 for case in case_1 case_2 case_3; do
     python scripts/run_imm.py               --case $case --max-iter 50000

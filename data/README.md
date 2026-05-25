@@ -31,9 +31,11 @@ From the `release/` folder run
 bash scripts/fetch_data.sh
 ```
 
-The script downloads both files (the cube is optional and skipped by
-default), verifies their SHA256 checksums, and drops them in the right
-place (`data/Data/Smat_36x36_90MHz.mat` and `data/S_data_cube_Vivaldi36.h5`).
+The script downloads `Smat_36x36_90MHz.mat`, verifies its SHA256
+checksum, and drops it in the right place
+(`data/Data/Smat_36x36_90MHz.mat`). The cube download is disabled by
+default; the supported workflow in this release is to build the cube
+locally with `python scripts/build_cube.py` once `Smat` is present.
 
 > Open `scripts/fetch_data.sh` and replace the `REPO_RELEASE_URL` and
 > `CUBE_SHA256` placeholders with the release tag URL and the cube's

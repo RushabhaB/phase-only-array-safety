@@ -51,7 +51,8 @@ Public API
 
 References
 ----------
-See ``docs/sdr_admm.pdf`` (in this repository) for the full derivation.
+See ``docs/sdr_admm.md`` (in this repository) for the derivation summary
+that matches this implementation.
 """
 
 from __future__ import annotations

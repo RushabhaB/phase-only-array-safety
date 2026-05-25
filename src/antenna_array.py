@@ -7,14 +7,24 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
-# Default location of the data files (element coordinates, coupling
-# matrix). Override via ARRAY_SAFETY_DATA. See data/README.md for the
-# expected contents.
+# Default data location. Override with ARRAY_SAFETY_DATA.
 _HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.environ.get(
     "ARRAY_SAFETY_DATA",
     os.path.normpath(os.path.join(_HERE, "..", "data", "Data")),
 )
+_COUPLING_CACHE = {}
+
+
+def _require_data_file(filename):
+    path = os.path.join(DATA_DIR, filename)
+    if not os.path.exists(path):
+        raise FileNotFoundError(
+            f"Required data file not found: {path}\n"
+            "See release/data/README.md for instructions on fetching the "
+            "coupling matrix and other external data."
+        )
+    return path
 
 
 class Array:
@@ -108,7 +118,8 @@ class Array:
             
     def _generate_element_coords(self):
         if self.arrayName == "Vivaldi36":
-            loc_data = scipy.io.loadmat(os.path.join(DATA_DIR, 'PC_xyz_m_36x36_Vivaldi.mat'))
+            loc_path = _require_data_file('PC_xyz_m_36x36_Vivaldi.mat')
+            loc_data = scipy.io.loadmat(loc_path)
             loc_data = loc_data['PC_xyz_m']
             elLoc = (loc_data[:,0] + 1j * loc_data[:,1])
         else:
@@ -211,13 +222,22 @@ class Array:
             return self.segment_manifolds
     
     def _get_coupling_matrix(self):
+        cache_key = self.arrayName
+        cached = _COUPLING_CACHE.get(cache_key)
+        if cached is not None:
+            self.freq_S_Ghz = cached["freq_S_Ghz"].copy()
+            self.Sf = cached["Sf"].copy()
+            return
+
         if self.arrayName == "Vivaldi36":
-            Smat_data = scipy.io.loadmat(os.path.join(DATA_DIR, 'Smat_36x36_90MHz.mat'))
+            smat_path = _require_data_file('Smat_36x36_90MHz.mat')
+            Smat_data = scipy.io.loadmat(smat_path)
             Smat = Smat_data['Smat']
             self.freq_S_Ghz= Smat['f_GHz'][0, 0].flatten()
             self.Sf = Smat['S'][0, 0]
         else:
-            Smat_data = scipy.io.loadmat(os.path.join(DATA_DIR, 'SimpleVivaldi_24x4_BruteForce18Pts.mat'))
+            smat_path = _require_data_file('SimpleVivaldi_24x4_BruteForce18Pts.mat')
+            Smat_data = scipy.io.loadmat(smat_path)
             Smat = Smat_data['Smat']
             self.freq_S_Ghz = Smat['f_GHz'][0, 0].flatten()
             self.freq_S_Ghz = np.asarray([3 + i/1e9 for i in range(len(self.freq_S_Ghz))])
@@ -230,19 +250,21 @@ class Array:
             self.Sf = Sf[np.ix_(idx, idx, bandIdx)]
 
         self._enforce_passivity()
+        _COUPLING_CACHE[cache_key] = {
+            "freq_S_Ghz": self.freq_S_Ghz.copy(),
+            "Sf": self.Sf.copy(),
+        }
 
     def _enforce_passivity(self, tol=1e-3):
-        # Project each S_k onto the passive cone by clamping its singular values to <=1.
-        # Full-wave EM solvers can produce slightly non-passive S due to port-discretization
-        # artifacts; without this, an iMM/convex solver could exploit the gain singular
-        # subspace and report Gamma^2 below what is physically achievable.
         Sf = np.asarray(self.Sf)
         max_violation = 0.0
         for k in range(Sf.shape[2]):
-            U, s, Vh = np.linalg.svd(Sf[:, :, k])
-            max_violation = max(max_violation, float(s.max()) - 1.0)
-            if s.max() > 1.0:
-                Sf[:, :, k] = (U * np.minimum(s, 1.0)) @ Vh
+            s = np.linalg.svd(Sf[:, :, k], compute_uv=False)
+            max_sigma = float(s[0])
+            max_violation = max(max_violation, max_sigma - 1.0)
+            if max_sigma > 1.0:
+                U, s_full, Vh = np.linalg.svd(Sf[:, :, k], full_matrices=False)
+                Sf[:, :, k] = (U * np.minimum(s_full, 1.0)) @ Vh
         self.Sf = Sf
         if max_violation > tol:
             print(f"[passivity] enforced; max sigma was {1+max_violation:.4f} (clamped to 1).")

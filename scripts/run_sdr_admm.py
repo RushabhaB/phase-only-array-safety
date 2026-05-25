@@ -20,7 +20,7 @@ With cold start (X = I) the ADMM trajectory converges very slowly to the
 SDR optimum -- empirically thousands of iterations and an unhelpful t
 plateau. Warm-starting with the iMM solution reaches the optimum in a
 few hundred iterations. The ``--warm-imm`` flag (default ON) does this
-automatically by loading ``weights/optimized_results_iMM_case_<N>.mat``.
+automatically by loading ``weights/imm/case_<N>_imm.mat``.
 """
 
 from __future__ import annotations

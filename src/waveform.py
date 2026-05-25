@@ -3,10 +3,7 @@ import numpy as np
 import math
 import scipy
 
-# Default location of the small data files (element coordinates, LFM
-# waveform, etc.). Override via the ARRAY_SAFETY_DATA env var if you move
-# them, e.g.
-#     export ARRAY_SAFETY_DATA=/path/to/release/data/Data
+# Default data location. Override with ARRAY_SAFETY_DATA.
 _HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.environ.get(
     "ARRAY_SAFETY_DATA",
@@ -14,9 +11,21 @@ DATA_DIR = os.environ.get(
 )
 
 
+def _require_data_file(filename):
+    path = os.path.join(DATA_DIR, filename)
+    if not os.path.exists(path):
+        raise FileNotFoundError(
+            f"Required data file not found: {path}\n"
+            "See release/data/README.md for instructions on the shipped and "
+            "external waveform/array files."
+        )
+    return path
+
+
 class Waveform():
     def __init__(self):
-        IQ = scipy.io.loadmat(os.path.join(DATA_DIR, "LFM_1280MHz_IBW.mat"))
+        iq_path = _require_data_file("LFM_1280MHz_IBW.mat")
+        IQ = scipy.io.loadmat(iq_path)
         self.IQ = IQ['IQ'] 
         
         self.fs = 1.6 # GHz

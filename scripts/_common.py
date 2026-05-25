@@ -88,9 +88,8 @@ def build_setup(case_key: str):
                              minlength=len(unique_s_idx))
     pwr_sqrt = np.sqrt(pwr_unique).astype(np.float64)
     n_unique = len(unique_s_idx)
-    D = np.empty((N, n_unique, N), dtype=np.complex128)
-    for m in range(N):
-        D[m] = ant.Sf[m, :, unique_s_idx] * pwr_sqrt[:, None]
+    D = np.transpose(ant.Sf[:, :, unique_s_idx], (0, 2, 1))
+    D = np.ascontiguousarray(D * pwr_sqrt[None, :, None])
 
     # Effective gain coefficient: Re(gain_coeffs . w) >= gmin
     I_minus_S = np.eye(N, dtype=np.complex128) - S_c

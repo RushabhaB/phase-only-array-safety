@@ -1,18 +1,7 @@
-"""Smoke tests that exercise the major code paths without requiring the
-16 GB data cube. Designed to run quickly on a laptop.
+"""Run quick release checks.
 
-Run from the release/ folder::
-
-    python tests/test_smoke.py
-
-The tests check:
-1. Library modules import cleanly.
-2. The antenna setup for each paper case builds without errors.
-3. The saved iMM weights round-trip through the SDR-ADMM warm-start
-   path and produce sane numerical values (gain >= gmin and the SDR
-   objective close to max_m |D_m w_iMM|^2).
-4. A short ADMM warm-started run on case_1 converges within ~50 iters
-   and lands within 1 dB of the iMM lifted value.
+Requires ``data/Data/Smat_36x36_90MHz.mat`` but not the 16 GB cube.
+Run from ``release/`` with ``python tests/test_smoke.py``.
 """
 
 from __future__ import annotations
@@ -27,6 +16,10 @@ sys.path.insert(0, os.path.join(_ROOT, "src"))
 sys.path.insert(0, os.path.join(_ROOT, "scripts"))
 
 import numpy as np
+
+
+def _smat_path():
+    return os.path.join(_ROOT, "data", "Data", "Smat_36x36_90MHz.mat")
 
 
 def _step(name, fn):
@@ -48,6 +41,10 @@ def test_imports():
 
 
 def test_setup_each_case():
+    if not os.path.exists(_smat_path()):
+        print("  SKIP: missing data/Data/Smat_36x36_90MHz.mat "
+              "(run bash scripts/fetch_data.sh)")
+        return
     from _common import CASES, build_setup
     for case in CASES:
         s = build_setup(case)
@@ -63,6 +60,10 @@ def test_setup_each_case():
 
 
 def test_imm_weights_load():
+    if not os.path.exists(_smat_path()):
+        print("  SKIP: missing data/Data/Smat_36x36_90MHz.mat "
+              "(run bash scripts/fetch_data.sh)")
+        return
     from _common import CASES, load_imm_weights, build_setup
     for case in CASES:
         try:
@@ -89,6 +90,10 @@ def test_imm_weights_load():
 def test_sdr_admm_short_run_case1():
     """Short warm-started ADMM run on case_1: should reach within 1 dB of
     the iMM lifted value in 30 iterations."""
+    if not os.path.exists(_smat_path()):
+        print("  SKIP: missing data/Data/Smat_36x36_90MHz.mat "
+              "(run bash scripts/fetch_data.sh)")
+        return
     from _common import build_setup, load_imm_weights
     import sdr_admm
 

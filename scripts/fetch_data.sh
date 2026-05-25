@@ -1,25 +1,20 @@
 #!/usr/bin/env bash
-# Download the auxiliary data files that are NOT shipped inside this Git
-# repository.
+# Download release data not tracked in Git.
 #
 # Usage (from the release/ folder):
 #
 #     bash scripts/fetch_data.sh
 #
-# What this fetches:
-#
-#   1. Smat_36x36_90MHz.mat   (~517 MB)  -- required by antenna_array.Array
-#   2. S_data_cube_Vivaldi36.h5 (~16 GB) -- required by scripts/run_imm.py
-#
-# Both are hosted as assets of a GitHub Release of this repository. The
-# URL and checksum below need to be set after the release is published.
+# Fetches:
+#   1. Smat_36x36_90MHz.mat (~517 MB), required by antenna_array.Array
+#   2. S_data_cube_Vivaldi36.h5 (~16 GB), optional and skipped by default
 
 set -euo pipefail
 
 REPO_RELEASE_URL="https://github.com/RushabhaB/phase-only-array-safety/releases/download/v0.1.0"
 # expected SHA256 checksums
 SMAT_SHA256="4704b49dec5d7e5735e73b5477ac4945c2ffc8d29a814b3ea40f7042191ae69b"
-CUBE_SHA256=""   # fill in once the 16 GB cube is uploaded
+CUBE_SHA256=""   # fill in only if the 16 GB cube is ever published as an asset
 
 DEST="$(dirname "$0")/../data/Data"
 mkdir -p "$DEST"
@@ -55,7 +50,7 @@ if [[ -n "$CUBE_SHA256" ]]; then
           "$CUBE_SHA256"
 else
     echo "[fetch] S_data_cube_Vivaldi36.h5 not configured -- skipping"
-    echo "        (only needed for scripts/run_imm.py)"
+    echo "        build it locally with: python scripts/build_cube.py"
 fi
 
 echo "[fetch] done"
