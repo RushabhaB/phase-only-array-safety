@@ -141,18 +141,16 @@ if non_unit_modulus
 end
 RC_user_Raw = 10*log10(RC_user_linear).';   % row 1x1296, matches RC_base_Raw
 
-% --- REORDER DATA (Python Row-Major -> MATLAB Column-Major) ---
-% 1. Reshape 1D vector to 36x36 Matrix.
-RC_base_Matrix_T = reshape(RC_base_Raw, 36, 36);
-RC_user_Matrix_T = reshape(RC_user_Raw, 36, 36);
-
-% 2. Transpose back to get correct physical alignment [Row, Col]
-RC_base_Matrix = RC_base_Matrix_T.';
-RC_user_Matrix = RC_user_Matrix_T.';
-
-% 3. Flatten using MATLAB's default Column-Major order to match 'elem' geometry
-RC_base = RC_base_Matrix(:);
-RC_user = RC_user_Matrix(:);
+% --- NO REORDER NEEDED ---
+% The Python bridge returns the per-port reflection coefficient indexed by
+% element in S-matrix / PC_xyz_m order, which is exactly the order of `elem`
+% (elem.ID = 1:N, elem.x = PC_xyz_m(:,1)). So RC_*_Raw(:) aligns directly with
+% (elem.x, elem.y). The previous reshape(36,36)->transpose->(:) block applied a
+% spurious 90-degree transpose that rotated the per-element heatmap, making the
+% (vertical) high-reflected-power strip at the segment boundary appear as a
+% horizontal band. Plot the raw vector as-is.
+RC_base = RC_base_Raw(:);
+RC_user = RC_user_Raw(:);
 % -----------------------------------------------------------------------------
 
 % C. Define Limits
